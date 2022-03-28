@@ -12,9 +12,9 @@ export default class MailNotifier {
         this.imap = new Imap(
             config
         )
-        this.imap.once('ready', () => this.onReady())
-        this.imap.once('error', this.onError)
-        this.imap.once('end', this.onEnd)
+        this.imap.on('ready', () => this.onReady())
+        this.imap.on('error', this.onError)
+        this.imap.on('end', this.onEnd)
     }
 
     startFetchingMail() {
@@ -39,7 +39,7 @@ export default class MailNotifier {
                         this.imap.end()
                         return
                     }
-                    if (uids) {
+                    if (uids.length === 0) {
                         console.log(`No mail match the criteria`)
                         this.imap.end()
                         return
@@ -85,7 +85,7 @@ export default class MailNotifier {
     findEmergencyMail(stream: NodeJS.ReadableStream, onEmergencyMailFound: (mail: ParsedMail) => void) {
         simpleParser(stream, async (err, mail) => {
             console.log(`[${mail.date?.toLocaleDateString()}] ${mail.subject}`)
-            if (mail.subject?.includes("穩定性問題") && mail.html) {
+            if (mail.subject?.includes("Android") && mail.subject?.includes("穩定性問題") && mail.html) {
                 onEmergencyMailFound(mail)
             }
         })
@@ -101,7 +101,7 @@ export default class MailNotifier {
                 "text": markdown
             },
             "at": {
-                "isAtAll": false
+                "isAtAll": true
             }
         }
         sendActionCardMessage(message)
